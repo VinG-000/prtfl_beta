@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-End Vector Portfolio</title>
+    
+    <!-- Google Fonts: Teko & Anton -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Teko:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- GSAP & ScrollTrigger for High-Performance Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* --- CORE VARIABLES & RESET --- */
+        :root {
+            /* Kezdőállapot: Hero (Off-white) */
+            --bg-color: #f0f0f0;
+            --text-main: #110C0B;
+            --text-accent: #333333;
+            --btn-bg: #110C0B;
+            --btn-text: #f0f0f0;
+            
+            --font-head: 'Teko', sans-serif;
+            --font-body: 'Anton', sans-serif;
+            
+            --spacing-unit: clamp(2rem, 5vw, 5rem);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.1s linear; /* GSAP fogja vezérelni */
+        }
+
+        /* --- PRELOADER --- */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .counter {
+            font-family: var(--font-head);
+            font-size: 15vw;
+            font-weight: 600;
+            line-height: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loader-curtain {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: #111;
+            z-index: 1;
+            transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .curtain-left { left: 0; transform-origin: left; }
+        .curtain-right { right: 0; transform-origin: right; }
+
+        /* --- FIXED BACKGROUNDS (VECTOR PATTERNS) --- */
+        .pattern-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.6; /* Kicsit növeltem az alap láthatóságot */
+            transition: mix-blend-mode 0.3s ease; /* Gyorsabb váltás */
+        }
+
+        .svg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0; 
+            transform-origin: center center;
+            will-change: opacity, transform; /* Teljesítmény optimalizálás */
+        }
+
+        /* --- TYPOGRAPHY & LAYOUT --- */
+        section {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: var(--spacing-unit);
+            position: relative;
+        }
+
+        h1, h2, h3 {
+            font-family: var(--font-head);
+            text-transform: uppercase;
+            line-height: 0.9;
+        }
+
+        h1 {
+            font-size: clamp(4rem, 12vw, 15rem);
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 2rem;
+            will-change: transform;
+        }
+
+        h2 {
+            font-size: clamp(3rem, 8vw, 8rem);
+            color: var(--text-accent);
+        }
+
+        p {
+            font-family: var(--font-body);
+            font-size: clamp(1rem, 1.5vw, 1.5rem);
+            max-width: 60ch;
+            line-height: 1.6;
+            letter-spacing: 0.5px;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .hero-section {
+            align-items: flex-start;
+        }
+
+        .theme-section {
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .theme-section:nth-child(even) {
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        /* --- UI ELEMENTS --- */
+        .btn {
+            display: inline-block;
+            padding: 1.5rem 3rem;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            font-family: var(--font-head);
+            font-size: 1.5rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid var(--btn-bg);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%);
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: var(--btn-bg);
+        }
+
+        /* Footer styling */
+        .footer-section {
+            min-height: 80vh;
+            align-items: center;
+            text-align: center;
+        }
+
+        .contact-form {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--text-main);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            font-size: 1.2rem;
+            outline: none;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: var(--text-accent);
+            opacity: 0.7;
+        }
+
+        /* --- THEME SPECIFIC SVG STYLING --- */
+        path, circle, line, rect, polygon {
+            vector-effect: non-scaling-stroke;
+        }
+
+        /* Scroll Progress Bar */
+        .progress-bar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 5px;
+            height: 0%;
+            background: var(--text-main);
+            z-index: 100;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- A. Fázis: Preloader -->
+    <div class="preloader">
+        <div class="loader-curtain curtain-left"></div>
+        <div class="loader-curtain curtain-right"></div>
+        <div class="counter">0%</div>
+    </div>
+
+    <!-- Background Layer (Fixed) -->
+    <div class="pattern-container" id="patternContainer">
+        <!-- 1. Vulkáni Kő -->
+        <svg class="svg-pattern" id="pattern-volcano" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <linearGradient id="grad-volcano" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:currentColor;stop-opacity:0.1" />
+                    <stop offset="100%" style="stop-color:currentColor;stop-opacity:0.5" />
+                </linearGradient>
+            </defs>
+            <path d="M0,0 L1000,0 L1000,1000 L0,1000 Z" fill="transparent"/>
+            <!-- Törött geometria / Repedések -->
+            <path d="M100,100 L300,150 L250,400 L50,300 Z" fill="url(#grad-volcano)" stroke="currentColor" stroke-width="2"/>
+            <path d="M600,50 L800,200 L900,100 L750,0 Z" fill="url(#grad-volcano)" stroke="currentColor" stroke-width="2"/>
+            <path d="M500,500 L700,550 L650,800 L450,700 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="10,5"/>
+            <path d="M100,800 L400,900 L200,1000 Z" fill="currentColor" opacity="0.2"/>
+            <path d="M0,500 L1000,600" stroke="currentColor" stroke-width="1"/>
+            <path d="M200,0 L300,1000" stroke="currentColor" stroke-width="1"/>
+        </svg>
+
+        <!-- 2. Antik Görög -->
+        <svg class="svg-pattern" id="pattern-greek" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <pattern id="meander" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                <path d="M10,10 H90 V90 H10 V20 H80 V80 H20 V30 H70 V70 H30 V40 H60 V60 H40 V50" fill="none" stroke="currentColor" stroke-width="2"/>
+            </pattern>
+            <rect x="0" y="0" width="100%" height="100%" fill="url(#meander)" opacity="0.15"/>
+            <path d="M800,100 L900,100 L900,900 L800,900 Z" fill="none" stroke="currentColor" stroke-width="4"/>
+            <path d="M810,100 V900 M830,100 V900 M850,100 V900 M870,100 V900 M890,100 V900" stroke="currentColor" stroke-width="1"/>
+            <circle cx="200" cy="200" r="150" fill="none" stroke="currentColor" stroke-width="2"/>
+        </svg>
+
+        <!-- 3. Dzsungel -->
+        <svg class="svg-pattern" id="pattern-jungle" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <path d="M0,500 Q250,200 500,500 T1000,500" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M0,600 Q250,300 500,600 T1000,600" fill="none" stroke="currentColor" stroke-width="1"/>
+            <path d="M0,400 Q250,100 500,400 T1000,400" fill="none" stroke="currentColor" stroke-width="3" opacity="0.5"/>
+            <path d="M800,800 Q700,600 900,500 Q1000,600 800,800 Z" fill="currentColor" opacity="0.1"/>
+            <path d="M200,800 Q100,600 300,500 Q400,600 200,800 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+            <circle cx="500" cy="500" r="300" stroke="currentColor" stroke-width="1" stroke-dasharray="20 10" opacity="0.3"/>
+        </svg>
+
+        <!-- 4. Kozmosz -->
+        <svg class="svg-pattern" id="pattern-cosmos" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <circle cx="500" cy="500" r="200" fill="none" stroke="currentColor" stroke-width="1"/>
+            <circle cx="500" cy="500" r="350" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 4"/>
+            <circle cx="500" cy="500" r="450" fill="none" stroke="currentColor" stroke-width="2"/>
+            <line x1="0" y1="500" x2="1000" y2="500" stroke="currentColor" stroke-width="0.5"/>
+            <line x1="500" y1="0" x2="500" y2="1000" stroke="currentColor" stroke-width="0.5"/>
+            <circle cx="100" cy="100" r="2" fill="currentColor"/>
+            <circle cx="900" cy="800" r="3" fill="currentColor"/>
+            <circle cx="200" cy="800" r="4" fill="currentColor"/>
+        </svg>
+
+        <!-- 5. Grafit -->
+        <svg class="svg-pattern" id="pattern-graphite" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+                    <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" opacity="0.3"/>
+            <path d="M500,200 L760,350 L760,650 L500,800 L240,650 L240,350 Z" fill="none" stroke="currentColor" stroke-width="4"/>
+            <path d="M760,350 L900,350 L950,300" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M240,650 L100,650 L50,700" fill="none" stroke="currentColor" stroke-width="2"/>
+        </svg>
+    </div>
+
+    <div class="progress-bar"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        
+        <!-- B. Fázis: Hero (Semleges) -->
+        <section class="hero-section" data-theme="hero">
+            <h1>High-End<br>Vision.</h1>
+            <p>Üdvözöllek a vizuális narratíva új szintjén. Görgesd lejjebb, és fedezd fel az elemek találkozását.</p>
+            <a href="#start" class="btn">Felfedezés</a>
+        </section>
+
+        <!-- C. Fázis: Témák -->
+        
+        <section class="theme-section" id="start" data-theme="volcano">
+            <h2>Ignis &<br>Bronze</h2>
+            <p>A kihűlt láva nyugalma találkozik az oxidált fémek patinájával. Ahol a repedésekben új élet születik. A vörös és a barna árnyalatai dominálnak, erőt és stabilitást sugározva.</p>
+            <a href="#" class="btn">Részletek</a>
+        </section>
+
+        <section class="theme-section" data-theme="greek">
+            <h2>Aeternum<br>Lapis</h2>
+            <p>A klasszikus rend. Természetes kő, homok és a sivatag csendje. A szimmetria és az arányok tökéletessége, amelyet az időtlenség leng körül.</p>
+            <a href="#" class="btn">Galéria</a>
+        </section>
+
+        <section class="theme-section" data-theme="jungle">
+            <h2>Veridis<br>Abyss</h2>
+            <p>Mélydzsungel, ahol a fény alig hatol át a lombokon. Moha, pára és méregzöld árnyalatok. Organikus formák, amelyek körbeölelik a tekintetet.</p>
+            <a href="#" class="btn">Merülj el</a>
+        </section>
+
+        <section class="theme-section" data-theme="cosmos">
+            <h2>Zero<br>Kelvin</h2>
+            <p>Az űr hideg érintése. Titánium szürkék és jeges kékek a végtelen feketében. A jövő technológiája és a csillagközi utazás magánya.</p>
+            <a href="#" class="btn">Adatok</a>
+        </section>
+
+        <section class="theme-section" data-theme="graphite">
+            <h2>Carbon &<br>Flare</h2>
+            <p>Ipari precizitás. Matt fekete felületek, amelyeket egyetlen, izzó narancs sugár tör meg. Szerkezet, rácsok és a modern építészet geometriája.</p>
+            <a href="#" class="btn">Specifikáció</a>
+        </section>
+
+        <!-- D. Fázis: Kapcsolat -->
+        <section class="footer-section" data-theme="footer">
+            <h2>Kapcsolat</h2>
+            <p>Alkossunk együtt valami maradandót.</p>
+            <form class="contact-form">
+                <input type="text" placeholder="Az Ön Neve">
+                <input type="email" placeholder="Email Címe">
+                <textarea rows="4" placeholder="Üzenet..."></textarea>
+                <button type="submit" class="btn">Küldés</button>
+            </form>
+        </section>
+
+    </main>
+
+    <script>
+        // Adatbázis - blendMode hozzáadva a láthatóság javítására
+        const themes = {
+            hero: {
+                bg: "#F5F5F5",
+                textMain: "#110C0B",
+                textAccent: "#333333",
+                btnBg: "#110C0B",
+                btnText: "#F5F5F5",
+                svgId: null,
+                blendMode: "multiply" // Világos háttér -> sötétítés
+            },
+            volcano: {
+                bg: "#110C0B", 
+                textMain: "#C49A6C",
+                textAccent: "#701A15",
+                btnBg: "#8C3623",
+                btnText: "#110C0B",
+                svgId: "pattern-volcano",
+                svgColor: "#E6CBA5",
+                blendMode: "screen" // Sötét háttér -> világosítás
+            },
+            greek: {
+                bg: "#E0D8C8",
+                textMain: "#3B322C",
+                textAccent: "#8C6B5D",
+                btnBg: "#A65E44",
+                btnText: "#F4F2E9",
+                svgId: "pattern-greek",
+                svgColor: "#3B322C",
+                blendMode: "multiply" // Közepes háttér -> sötét minta
+            },
+            jungle: {
+                bg: "#061412",
+                textMain: "#D1D6C7",
+                textAccent: "#5C756D",
+                btnBg: "#355E56",
+                btnText: "#D1D6C7",
+                svgId: "pattern-jungle",
+                svgColor: "#5C756D",
+                blendMode: "screen" // Nagyon sötét háttér -> világosítás
+            },
+            cosmos: {
+                bg: "#0B0B0F",
+                textMain: "#D4D3DE",
+                textAccent: "#555375",
+                btnBg: "#363554",
+                btnText: "#D4D3DE",
+                svgId: "pattern-cosmos",
+                svgColor: "#7C7A96",
+                blendMode: "screen"
+            },
+            graphite: {
+                bg: "#050505",
+                textMain: "#CC6625",
+                textAccent: "#404040",
+                btnBg: "#AD5119",
+                btnText: "#050505",
+                svgId: "pattern-graphite",
+                svgColor: "#CC6625", // Erősebb szín a láthatóságért
+                blendMode: "screen"
+            },
+            footer: {
+                bg: "#171717",
+                textMain: "#ffffff",
+                textAccent: "#888888",
+                btnBg: "#ffffff",
+                btnText: "#000000",
+                svgId: null,
+                blendMode: "normal"
+            }
+        };
+
+        // --- PRELOADER LOGIC ---
+        function initPreloader() {
+            const counter = document.querySelector('.counter');
+            const preloader = document.querySelector('.preloader');
+            
+            let count = 0;
+            const interval = setInterval(() => {
+                count++;
+                counter.innerText = count + "%";
+                
+                if (count >= 100) {
+                    clearInterval(interval);
+                    revealSite();
+                }
+            }, 20);
+
+            function revealSite() {
+                const tl = gsap.timeline();
+                tl.to(counter, { duration: 0.5, opacity: 0, y: -50, ease: "power2.in" })
+                .to('.curtain-left', { width: "0%", duration: 1.2, ease: "power4.inOut" }, "-=0.2")
+                .to('.curtain-right', { width: "0%", duration: 1.2, ease: "power4.inOut" }, "<")
+                .set(preloader, { display: "none" })
+                .from(".hero-section h1", { y: 100, opacity: 0, duration: 1, ease: "power3.out" }, "-=0.5")
+                .from(".hero-section p", { y: 50, opacity: 0, duration: 1, ease: "power3.out" }, "-=0.8")
+                .from(".hero-section .btn", { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.8");
+            }
+        }
+
+        // --- SCROLL ANIMATION LOGIC ---
+        function initScrollAnimations() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            gsap.to(".progress-bar", {
+                height: "100%",
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "body",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 0
+                }
+            });
+
+            document.querySelectorAll('section').forEach((section) => {
+                const themeName = section.dataset.theme;
+                const theme = themes[themeName];
+                
+                if (!theme) return;
+
+                ScrollTrigger.create({
+                    trigger: section,
+                    start: "top 60%", // Korábban vált, hogy elkerülje a torlódást
+                    end: "bottom 60%",
+                    onEnter: () => changeTheme(theme),
+                    onEnterBack: () => changeTheme(theme),
+                });
+
+                gsap.from(section.querySelectorAll('h2, p, .btn'), {
+                    y: 50,
+                    opacity: 0,
+                    duration: 1,
+                    stagger: 0.2,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 75%",
+                    }
+                });
+            });
+        }
+
+        function changeTheme(theme) {
+            // 1. Szín átmenet
+            gsap.to(":root", {
+                "--bg-color": theme.bg,
+                "--text-main": theme.textMain,
+                "--text-accent": theme.textAccent,
+                "--btn-bg": theme.btnBg,
+                "--btn-text": theme.btnText,
+                duration: 0.8, // Kicsit gyorsabb
+                ease: "power2.inOut"
+            });
+
+            // 2. Konténer Blend Mode váltása
+            const container = document.getElementById('patternContainer');
+            container.style.mixBlendMode = theme.blendMode;
+
+            // 3. SVG Kezelés (JAVÍTOTT LOGIKA)
+            // Azonnal megöljük az összes futó SVG animációt, hogy ne legyen torlódás
+            gsap.killTweensOf(".svg-pattern");
+
+            // Gyorsan eltüntetünk mindent, ami nem az aktuális
+            const allSvgs = document.querySelectorAll('.svg-pattern');
+            allSvgs.forEach(svg => {
+                if(svg.id !== theme.svgId) {
+                    gsap.to(svg, { opacity: 0, duration: 0.3, overwrite: true });
+                }
+            });
+
+            // Ha van új SVG, beúsztatjuk
+            if (theme.svgId) {
+                const activeSvg = document.getElementById(theme.svgId);
+                
+                // Szín beállítása
+                gsap.set(activeSvg, { color: theme.svgColor, zIndex: 10 }); // Előtérbe hozás
+
+                // Animáció
+                gsap.fromTo(activeSvg, 
+                    { 
+                        opacity: 0, 
+                        scale: 1.15, 
+                        rotation: -3 
+                    },
+                    { 
+                        opacity: 1, 
+                        scale: 1, 
+                        rotation: 0, 
+                        duration: 1.2, 
+                        ease: "power2.out",
+                        overwrite: true // Fontos: felülírja az előző "eltűnés" parancsot ha volt
+                    }
+                );
+            }
+        }
+
+        window.addEventListener('load', () => {
+            initPreloader();
+            initScrollAnimations();
+        });
+
+    </script>
+</body>
+</html>
