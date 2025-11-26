@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vincze Gábor - Portfolio</title>
+   
+    <!-- Google Fonts: Teko & Anton -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Teko:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+   
+    <!-- ANIME.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <style>
+        /* --- CORE VARIABLES --- */
+        :root {
+            --bg-color: #f0f0f0;
+            --text-main: #110C0B;
+            --text-accent: #333333;
+            --btn-bg: #110C0B;
+            --btn-text: #f0f0f0;
+            
+            --font-head: 'Teko', sans-serif;
+            --font-body: 'Anton', sans-serif;
+            
+            --spacing-unit: clamp(2rem, 5vw, 5rem);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.1s linear;
+        }
+
+        /* --- BACKGROUNDS --- */
+        .pattern-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.6;
+            transition: mix-blend-mode 0.3s ease;
+        }
+
+        .svg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            will-change: opacity, transform;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3 {
+            font-family: var(--font-head);
+            text-transform: uppercase;
+            line-height: 0.9;
+        }
+
+        /* HERO CÍM - FENT KÖZÉPEN */
+        h1.hero-title {
+            font-size: clamp(5rem, 15vw, 18rem);
+            font-weight: 700;
+            letter-spacing: -4px;
+            margin: 0;
+            color: var(--text-main);
+            line-height: 0.85;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: clamp(3rem, 8vw, 8rem);
+            color: var(--text-accent);
+        }
+
+        h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        /* HERO ALSÓ KONTÉNER (Szöveg + Gomb) - VISSZA JOBB ALULRA */
+        .hero-bottom-container {
+            position: absolute;
+            bottom: 5vh;
+            right: 5vw; /* Jobb szél */
+            left: auto; /* Nem középen */
+            transform: none; /* Nincs közép transzformáció */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* Jobbra igazítás */
+            gap: 1.5rem; 
+            width: auto;
+            max-width: 400px;
+            padding: 0;
+            opacity: 0; /* Animáció hozza be */
+        }
+
+        /* KIS SZÖVEG - A GOMB FELETT, JOBBRA IGAZÍTVA */
+        .hero-small-text {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-accent);
+            text-align: right;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- UI ELEMENTS --- */
+        .btn {
+            display: inline-block;
+            padding: 1.5rem 3rem;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            font-family: var(--font-head);
+            font-size: 1.5rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid var(--btn-bg);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%);
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: var(--btn-bg);
+        }
+
+        /* --- SECTIONS --- */
+        .vertical-section {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-unit);
+            position: relative;
+        }
+
+        /* HERO SPECIFIKUS - FENTRE IGAZÍTVA */
+        .hero-section {
+            justify-content: flex-start; /* Tartalom a tetejére */
+            padding-top: 15vh; 
+            align-items: center; 
+            text-align: center;
+        }
+
+        .vertical-section.right-aligned {
+            justify-content: center;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .vertical-section.left-aligned {
+            justify-content: center;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        /* --- GREEK SLIDER --- */
+        .greek-section {
+            justify-content: center;
+            align-items: flex-start;
+            overflow: hidden;
+        }
+
+        .slider-wrapper {
+            width: 100%;
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+            padding: 3rem 0;
+        }
+
+        .slider-wrapper:active { cursor: grabbing; }
+
+        .slider-track {
+            display: flex;
+            gap: 2rem;
+            width: max-content;
+            will-change: transform;
+            padding-left: 2rem;
+        }
+
+        .project-card {
+            width: 28vw; 
+            min-width: 300px;
+            height: 50vh;
+            min-height: 450px;
+            border: 1px solid var(--text-accent);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(2px);
+            isolation: isolate;
+            transform-style: preserve-3d;
+            overflow: hidden; 
+            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+            user-select: none; 
+        }
+
+        .card-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.6; 
+            filter: grayscale(100%) sepia(20%);
+            transition: transform 0.6s ease, opacity 0.4s ease, filter 0.4s ease;
+            pointer-events: none; 
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+
+        .project-card h3, .project-card p, .project-card .btn {
+            transform: translateZ(20px);
+            will-change: transform;
+            z-index: 10; 
+            position: relative;
+        }
+        
+        .project-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            z-index: 20;
+        }
+
+        .project-card:hover .card-image {
+            transform: scale(1.1); 
+            opacity: 0.9; 
+            filter: grayscale(0%) sepia(0%);
+        }
+
+        .drag-hint {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            margin-top: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .drag-hint::before { content: '←'; }
+        .drag-hint::after { content: '→'; }
+
+        @media (max-width: 768px) { .project-card { width: 80vw; } }
+
+        /* Footer */
+        .footer-section {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: var(--spacing-unit);
+        }
+
+        .contact-form {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--text-main);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            font-size: 1.2rem;
+            outline: none;
+        }
+
+        .progress-bar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 5px;
+            height: 0%;
+            background: var(--text-main);
+            z-index: 100;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="pattern-container" id="patternContainer">
+        <!-- 1. Vulkáni Kő (JAVÍTOTT REPEDÉS) -->
+        <svg class="svg-pattern" id="pattern-volcano" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <linearGradient id="grad-volcano" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:currentColor;stop-opacity:0.1" />
+                    <stop offset="100%" style="stop-color:currentColor;stop-opacity:0.4" />
+                </linearGradient>
+            </defs>
+            
+            <!-- Nagy törött formák a széleken -->
+            <path d="M-50,200 L150,100 L250,350 L0,450 Z" fill="url(#grad-volcano)" stroke="currentColor" stroke-width="2" opacity="0.6" />
+            <path d="M800,800 L1050,700 L950,950 L750,1050 Z" fill="url(#grad-volcano)" stroke="currentColor" stroke-width="2" opacity="0.6" />
+            
+            <!-- Repedések / Éles vonalak -->
+            <g stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5">
+                <!-- Hosszú repedés átlósan -->
+                <path d="M200,200 L450,280 L500,250 L800,350" />
+                <!-- Kisebb repedés lent -->
+                <path d="M100,850 L300,800 L350,880" />
+                <!-- Függőlegesebb törés jobb oldalon -->
+                <path d="M850,100 L820,300 L900,450" />
+                
+                <!-- JAVÍTÁS: Központi repedés EGYETLEN ÚTVONALKÉNT (PATH), nem két külön vonal -->
+                <path d="M400,500 L600,550 L550,700" />
+            </g>
+            
+            <!-- Egy-két tömör geometriai elem dísznek -->
+            <path d="M600,150 L650,200 L620,250 Z" fill="currentColor" opacity="0.3" />
+            <path d="M200,700 L250,720 L220,780 Z" fill="currentColor" opacity="0.3" />
+        </svg>
+
+        <svg class="svg-pattern" id="pattern-greek" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <g class="meander-shapes" opacity="0.18" stroke="currentColor" stroke-width="2" fill="none">
+                 <path transform="translate(100, 100) scale(3.0)" d="M10,10 H90 V90 H10 V20 H80 V80 H20 V30 H70 V70 H30 V40 H60 V60 H40 V50" />
+                 <path transform="translate(850, 80) scale(2.5)" d="M10,10 H90 V90 H10 V20 H80 V80 H20 V30 H70 V70 H30 V40 H60 V60 H40 V50" />
+                 <path transform="translate(400, 350) scale(1.6)" d="M10,10 H90 V90 H10 V20 H80 V80 H20 V30 H70 V70 H30 V40 H60 V60 H40 V50" />
+                 <path transform="translate(50, 800) scale(1.8)" d="M10,10 H90 V90 H10 V20 H80 V80 H20 V30 H70 V70 H30 V40 H60 V60 H40 V50" />
+                 <path transform="translate(700, 750) scale(1.5)" d="M10,10 H90 V90 H10 V20 H80 V80 H20 V30 H70 V70 H30 V40 H60 V60 H40 V50" />
+            </g>
+            <line x1="940" y1="0" x2="940" y2="1000" stroke="#A65E44" stroke-width="8" opacity="0.8"/><line x1="960" y1="0" x2="960" y2="1000" stroke="#A65E44" stroke-width="2"/><line x1="975" y1="0" x2="975" y2="1000" stroke="#A65E44" stroke-width="2"/>
+        </svg>
+        <svg class="svg-pattern" id="pattern-jungle" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <path d="M0,500 Q250,200 500,500 T1000,500" fill="none" stroke="currentColor" stroke-width="2"/><path d="M0,600 Q250,300 500,600 T1000,600" fill="none" stroke="currentColor" stroke-width="1"/><path d="M0,400 Q250,100 500,400 T1000,400" fill="none" stroke="currentColor" stroke-width="3" opacity="0.5"/><circle cx="500" cy="500" r="300" stroke="currentColor" stroke-width="1" stroke-dasharray="20 10" opacity="0.3"/>
+        </svg>
+        <svg class="svg-pattern" id="pattern-cosmos" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <circle cx="500" cy="500" r="200" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="500" cy="500" r="350" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 4"/><circle cx="500" cy="500" r="450" fill="none" stroke="currentColor" stroke-width="2"/><line x1="0" y1="500" x2="1000" y2="500" stroke="currentColor" stroke-width="0.5"/><line x1="500" y1="0" x2="500" y2="1000" stroke="currentColor" stroke-width="0.5"/><circle cx="100" cy="100" r="2" fill="currentColor"/><circle cx="900" cy="800" r="3" fill="currentColor"/><circle cx="200" cy="800" r="4" fill="currentColor"/>
+        </svg>
+        <svg class="svg-pattern" id="pattern-graphite" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <defs><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)" opacity="0.3"/><path d="M500,200 L760,350 L760,650 L500,800 L240,650 L240,350 Z" fill="none" stroke="currentColor" stroke-width="4"/><path d="M760,350 L900,350 L950,300" fill="none" stroke="currentColor" stroke-width="2"/>
+        </svg>
+    </div>
+
+    <div class="progress-bar"></div>
+
+    <main>
+        <!-- 1. HERO - FENT KÖZÉPEN A NÉV -->
+        <section class="vertical-section hero-section" data-theme="hero">
+            <h1 class="hero-title">
+                <span class="hero-vincze">Vincze</span>
+                <span class="hero-gabor">Gábor.</span>
+            </h1>
+            
+            <!-- GOMB ÉS SZÖVEG KONTÉNER JOBB ALUL -->
+            <div class="hero-bottom-container">
+                <!-- Szöveg felül -->
+                <div class="hero-small-text">
+                    Üdvözöllek a vizuális narratíva új szintjén.<br>
+                    Görgesd lejjebb, és fedezd fel az elemek találkozását.
+                </div>
+                <!-- Gomb alul -->
+                <a href="#contact" class="btn">Kapcsolat</a>
+            </div>
+        </section>
+
+        <!-- 2. GÖRÖG SZEKCIÓ -->
+        <section class="vertical-section greek-section" id="greek-projects" data-theme="greek">
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap;">
+                <div>
+                    <h2>Aeternum<br>Lapis</h2>
+                    <p style="margin-bottom: 0;">A klasszikus rend. Természetes kő, homok és a sivatag csendje.</p>
+                </div>
+                <div class="drag-hint">Húzd a munkák böngészéséhez</div>
+            </div>
+
+            <div class="slider-wrapper">
+                <div class="slider-track">
+                    <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1555662797-20725cb0615a?auto=format&fit=crop&w=800&q=80" class="card-image" alt="Parthenon Art">
+                        <h3>Parthenon</h3>
+                        <p>Digitális rekonstrukció és arculattervezés.</p>
+                        <a href="#" class="btn" style="margin-top: auto; align-self: flex-start;">Megtekintés</a>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1504730655568-71c9963e1c52?auto=format&fit=crop&w=800&q=80" class="card-image" alt="Milos Architecture">
+                        <h3>Milos</h3>
+                        <p>Minimalista építészeti látványtervek.</p>
+                        <a href="#" class="btn" style="margin-top: auto; align-self: flex-start;">Megtekintés</a>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=800&q=80" class="card-image" alt="Agora Geometry">
+                        <h3>Agora</h3>
+                        <p>Komplex vektoros ikonrendszer.</p>
+                        <a href="#" class="btn" style="margin-top: auto; align-self: flex-start;">Megtekintés</a>
+                    </div>
+                     <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1651426090302-3c360162e360?auto=format&fit=crop&w=800&q=80" class="card-image" alt="Olympus Mountains">
+                        <h3>Olympus</h3>
+                        <p>Márkaidentitás egy prémium utazási irodának.</p>
+                        <a href="#" class="btn" style="margin-top: auto; align-self: flex-start;">Megtekintés</a>
+                    </div>
+                     <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1505567745926-ba89000d255a?auto=format&fit=crop&w=800&q=80" class="card-image" alt="Crete Map">
+                        <h3>Kréta</h3>
+                        <p>Interaktív térkép design.</p>
+                        <a href="#" class="btn" style="margin-top: auto; align-self: flex-start;">Megtekintés</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- További szekciók -->
+        <section class="vertical-section right-aligned" data-theme="volcano">
+            <h2>Ignis &<br>Bronze</h2>
+            <p>A kihűlt láva nyugalma találkozik az oxidált fémek patinájával.</p>
+            <a href="#" class="btn">Részletek</a>
+        </section>
+
+        <section class="vertical-section left-aligned" data-theme="jungle">
+            <h2>Veridis<br>Abyss</h2>
+            <p>Mélydzsungel, ahol a fény alig hatol át a lombokon.</p>
+            <a href="#" class="btn">Merülj el</a>
+        </section>
+
+        <section class="vertical-section right-aligned" data-theme="cosmos">
+            <h2>Zero<br>Kelvin</h2>
+            <p>Az űr hideg érintése. Titánium szürkék és jeges kékek.</p>
+            <a href="#" class="btn">Adatok</a>
+        </section>
+
+        <section class="vertical-section left-aligned" data-theme="graphite">
+            <h2>Carbon &<br>Flare</h2>
+            <p>Ipari precizitás. Matt fekete felületek, izzó narancs fénnyel.</p>
+            <a href="#" class="btn">Specifikáció</a>
+        </section>
+
+        <!-- Footer -> ID hozzáadva: contact -->
+        <section class="footer-section" data-theme="footer" id="contact">
+            <h2>Kapcsolat</h2>
+            <p>Alkossunk együtt valami maradandót.</p>
+            <form class="contact-form">
+                <input type="text" placeholder="Az Ön Neve">
+                <input type="email" placeholder="Email Címe">
+                <textarea rows="4" placeholder="Üzenet..."></textarea>
+                <button type="submit" class="btn">Küldés</button>
+            </form>
+        </section>
+
+    </main>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+        // --- ADATBÁZIS ---
+        const themes = {
+            hero: { bg: "#F5F5F5", textMain: "#110C0B", textAccent: "#333333", btnBg: "#110C0B", btnText: "#F5F5F5", svgId: null, blendMode: "multiply" },
+            volcano: { bg: "#110C0B", textMain: "#E6CBA5", textAccent: "#8C3623", btnBg: "#701A15", btnText: "#E6CBA5", svgId: "pattern-volcano", svgColor: "#4A0404", blendMode: "screen" },
+            greek: { bg: "#E6DBCB", textMain: "#3B322C", textAccent: "#A65E44", btnBg: "#A65E44", btnText: "#F4F2E9", svgId: "pattern-greek", svgColor: "#A89F91", blendMode: "multiply" },
+            jungle: { bg: "#061412", textMain: "#D1D6C7", textAccent: "#5C756D", btnBg: "#1B403B", btnText: "#D1D6C7", svgId: "pattern-jungle", svgColor: "#112926", blendMode: "screen" },
+            cosmos: { bg: "#0B0B0F", textMain: "#D4D3DE", textAccent: "#7C7A96", btnBg: "#363554", btnText: "#D4D3DE", svgId: "pattern-cosmos", svgColor: "#232338", blendMode: "screen" },
+            graphite: { bg: "#050505", textMain: "#CC6625", textAccent: "#404040", btnBg: "#AD5119", btnText: "#050505", svgId: "pattern-graphite", svgColor: "#171717", blendMode: "screen" },
+            footer: { bg: "#080808", textMain: "#F5F5F5", textAccent: "#888888", btnBg: "#F5F5F5", btnText: "#080808", svgId: null, blendMode: "normal" }
+        };
+
+        // --- STARTUP ANIMATION ---
+        function startHeroAnimation() {
+            const tl = gsap.timeline({ easing: "power3.out" });
+            
+            tl.from(".hero-title", {
+                duration: 1.5,
+                y: -50,
+                opacity: 0,
+                delay: 0.2
+            })
+            // A teljes alsó konténer (gomb+szöveg) animálása jobbról
+            .fromTo(".hero-bottom-container", 
+                { x: 30, opacity: 0 },
+                { x: 0, opacity: 1, duration: 1 },
+            "-=0.5");
+        }
+
+        // --- SLIDER & SCROLL ---
+        function initDraggableSlider() {
+            const slider = document.querySelector('.slider-wrapper');
+            const track = document.querySelector('.slider-track');
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+            
+            const originalCards = Array.from(track.children);
+            const cardCount = originalCards.length;
+            
+            const clonesBefore = originalCards.map(card => card.cloneNode(true));
+            const clonesAfter = originalCards.map(card => card.cloneNode(true));
+            
+            clonesBefore.reverse().forEach(card => track.insertBefore(card, track.firstChild));
+            clonesAfter.forEach(card => track.appendChild(card));
+
+            const setInitialPosition = () => {
+                const cardWidth = originalCards[0].offsetWidth;
+                const gap = 32; 
+                const singleSetWidth = (cardWidth + gap) * cardCount;
+                slider.scrollLeft = singleSetWidth;
+                return singleSetWidth;
+            };
+
+            let singleSetWidth = 0;
+            requestAnimationFrame(() => { singleSetWidth = setInitialPosition(); });
+            window.addEventListener('resize', () => { singleSetWidth = setInitialPosition(); });
+
+            slider.addEventListener('mousedown', (e) => {
+                if(e.target.tagName.toLowerCase() === 'a' || e.target.closest('a')) return;
+                isDown = true;
+                slider.classList.add('active');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+                e.preventDefault(); 
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDown = false;
+                if(slider) slider.classList.remove('active');
+            });
+
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 1.0; 
+                slider.scrollLeft = scrollLeft - walk;
+            });
+
+            slider.addEventListener('scroll', () => {
+                if(singleSetWidth === 0) return;
+                if (slider.scrollLeft >= singleSetWidth * 2) slider.scrollLeft -= singleSetWidth;
+                else if (slider.scrollLeft <= 0) slider.scrollLeft += singleSetWidth;
+                else if (slider.scrollLeft < 10) slider.scrollLeft += singleSetWidth;
+            });
+        }
+
+        function initScrollAnimations() {
+            gsap.to(".progress-bar", {
+                height: "100%",
+                ease: "none",
+                scrollTrigger: { trigger: "body", start: "top top", end: "bottom bottom", scrub: 0 }
+            });
+
+            document.querySelectorAll('.vertical-section, .footer-section').forEach((section) => {
+                const themeName = section.dataset.theme;
+                const theme = themes[themeName];
+                if (!theme) return;
+
+                ScrollTrigger.create({
+                    trigger: section,
+                    start: "top 60%",
+                    end: "bottom 60%",
+                    onEnter: () => changeTheme(theme),
+                    onEnterBack: () => changeTheme(theme),
+                });
+
+                if (!section.classList.contains('hero-section')) {
+                    gsap.from(section.querySelectorAll('h1, h2, p, .btn:not(.slider-track .btn)'), {
+                        y: 50, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out",
+                        scrollTrigger: { trigger: section, start: "top 75%" }
+                    });
+                }
+            });
+        }
+
+        function changeTheme(theme) {
+            gsap.to(":root", {
+                "--bg-color": theme.bg, "--text-main": theme.textMain, "--text-accent": theme.textAccent,
+                "--btn-bg": theme.btnBg, "--btn-text": theme.btnText, duration: 0.8, ease: "power2.inOut"
+            });
+
+            const container = document.getElementById('patternContainer');
+            container.style.mixBlendMode = theme.blendMode;
+
+            anime.remove('.svg-pattern, .svg-pattern *');
+            const allSvgs = document.querySelectorAll('.svg-pattern');
+            const activeSvg = theme.svgId ? document.getElementById(theme.svgId) : null;
+
+            allSvgs.forEach(svg => {
+                if(svg !== activeSvg) {
+                    anime({ targets: svg, opacity: 0, duration: 400, easing: 'easeOutQuad', complete: function(anim) { svg.style.display = 'none'; } });
+                }
+            });
+
+            if (activeSvg) {
+                activeSvg.style.display = 'block';
+                activeSvg.style.color = theme.svgColor;
+                const tl = anime.timeline({ easing: 'easeOutExpo', duration: 1500 });
+                tl.add({ targets: activeSvg, opacity: [0, 1], scale: [1.1, 1], duration: 1000 });
+                const shapes = activeSvg.querySelectorAll('path, circle, line, rect, polygon');
+                if(shapes.length > 0) {
+                    tl.add({
+                        targets: shapes,
+                        strokeDashoffset: [(el) => anime.setDashoffset(el) * 1.2, 0],
+                        opacity: [0, 1],
+                        easing: 'easeInOutSine',
+                        duration: () => anime.random(1500, 3000), 
+                        delay: anime.stagger(200),
+                    }, '-=800');
+                }
+            }
+        }
+
+        window.addEventListener('load', () => {
+            startHeroAnimation(); 
+            initScrollAnimations();
+            initDraggableSlider();
+        });
+
+    </script>
+</body>
+</html>
